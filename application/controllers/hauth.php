@@ -1,12 +1,7 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
-class HAuth extends CI_Controller {
-
-	public function index()
-	{
-		$this->load->view('hauth/home');
-	}
-
+class HAuth extends CI_Controller
+{
 	public function login($provider)
 	{
 		log_message('debug', "controllers.HAuth.login($provider) called");
@@ -16,13 +11,14 @@ class HAuth extends CI_Controller {
 			log_message('debug', 'controllers.HAuth.login: loading HybridAuthLib');
 			$this->load->library('HybridAuthLib');
 
-			if ($this->hybridauthlib->providerEnabled($provider))
+			if ($this->hybridauthlib->serviceEnabled($provider))
 			{
 				log_message('debug', "controllers.HAuth.login: service $provider enabled, trying to authenticate.");
 				$service = $this->hybridauthlib->authenticate($provider);
 
 				if ($service->isUserConnected())
 				{
+					log_message('debug', 'YEAAAAAH');
 					log_message('debug', 'controller.HAuth.login: user authenticated.');
 
 					$user_profile = $service->getUserProfile();
@@ -30,8 +26,23 @@ class HAuth extends CI_Controller {
 					log_message('info', 'controllers.HAuth.login: user profile:'.PHP_EOL.print_r($user_profile, TRUE));
 
 					$data['user_profile'] = $user_profile;
+			
 
-					$this->load->view('hauth/done',$data);
+					$data['id_provider'] = $data['user_profile']->identifier."_".strtolower($provider);
+					$data['profile'] = $data['user_profile']->profileURL;
+					$data['avatar'] = $data['user_profile']->photoURL;
+					
+					$iduser = $this->initSession($data['id_provider'],$data['user_profile']->displayName,$data['user_profile']);			
+
+					$data['name'] = $data['user_profile']->displayName;
+					$data['iduser'] = $iduser;
+
+					$this->session->set_userdata($data);
+
+				
+				 	//redirect('/home/', 'refresh');
+				 	redirect('/', 'refresh');
+
 				}
 				else // Cannot authenticate user
 				{
@@ -40,7 +51,6 @@ class HAuth extends CI_Controller {
 			}
 			else // This service is not enabled.
 			{
-				log_message('error', 'controllers.HAuth.login: This provider is not enabled ('.$provider.')');
 				show_404($_SERVER['REQUEST_URI']);
 			}
 		}
@@ -75,13 +85,12 @@ class HAuth extends CI_Controller {
 			}
 
 			log_message('error', 'controllers.HAuth.login: '.$error);
-			show_error('Error authenticating user.');
+			show_error('Error authenticating user: ' . $error);
 		}
 	}
 
 	public function endpoint()
 	{
-
 		log_message('debug', 'controllers.HAuth.endpoint called.');
 		log_message('info', 'controllers.HAuth.endpoint: $_REQUEST: '.print_r($_REQUEST, TRUE));
 
@@ -93,9 +102,30 @@ class HAuth extends CI_Controller {
 
 		log_message('debug', 'controllers.HAuth.endpoint: loading the original HybridAuth endpoint script.');
 		require_once APPPATH.'/third_party/hybridauth/index.php';
-
 	}
+
+	private function initSession ($iduser,$name,$data) {
+		$myid = -1;
+		// User exists?
+		$sql = "select * from users where user =".$this->db->escape($iduser);
+		$result = $this->db->query($sql);
+
+		// If not
+		if ($result->num_rows() == 0) {
+			$sql = "INSERT INTO users (user,name,data) VALUES(".$this->db->escape($iduser).",".$this->db->escape($name).",".$this->db->escape($data).")";		
+			$result = $this->db->query($sql);
+			$myid = $this->db->insert_id();
+		} else {
+			$row = $result->row(); 
+			$sql = "update users set name=".$this->db->escape($name).", data=".$this->db->escape($data)." where id=".$row->id;		
+			$result = $this->db->query($sql);
+			$myid = $row->id;
+		}
+
+		return  $myid;
+	}
+
 }
 
-/* End of file hauth.php */
-/* Location: ./application/controllers/hauth.php */
+/* End of file test.php */
+/* Location: ./application/controllers/test.php */
