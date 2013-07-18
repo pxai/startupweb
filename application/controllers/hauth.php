@@ -2,7 +2,16 @@
 
 class HAuth extends CI_Controller
 {
-	public function login($provider)
+	/**
+	* signin
+	* offers some sign in sites links
+	*/
+	public function signin() {
+				$this->load->view('hauth/home');
+	}
+
+
+	public function login($provider="")
 	{
 		log_message('debug', "controllers.HAuth.login($provider) called");
 
@@ -11,7 +20,7 @@ class HAuth extends CI_Controller
 			log_message('debug', 'controllers.HAuth.login: loading HybridAuthLib');
 			$this->load->library('HybridAuthLib');
 
-			if ($this->hybridauthlib->serviceEnabled($provider))
+			if ($provider != "" && $this->hybridauthlib->serviceEnabled($provider))
 			{
 				log_message('debug', "controllers.HAuth.login: service $provider enabled, trying to authenticate.");
 				$service = $this->hybridauthlib->authenticate($provider);
@@ -105,21 +114,24 @@ class HAuth extends CI_Controller
 	}
 
 	private function initSession ($iduser,$name,$data) {
+
 		$myid = -1;
+		$this->load->model('user_model');
+		
 		// User exists?
-		$sql = "select * from users where user =".$this->db->escape($iduser);
+		$sql = "select * from users where identifier =".$this->db->escape($iduser);
 		$result = $this->db->query($sql);
 
-		// If not
+		// If not exists
 		if ($result->num_rows() == 0) {
-			$sql = "INSERT INTO users (user,name,data) VALUES(".$this->db->escape($iduser).",".$this->db->escape($name).",".$this->db->escape($data).")";		
-			$result = $this->db->query($sql);
-			$myid = $this->db->insert_id();
+			$data->identifier = $iduser;
+			$myid = $this->user_model->create( (array) $data);
+			//$sql = "INSERT INTO users (user,name,data) VALUES(".$this->db->escape($iduser).",".$this->db->escape($name).",".$this->db->escape($data).")";		
+			//$result = $this->db->query($sql);
+			//$myid = $this->db->insert_id();
 		} else {
-			$row = $result->row(); 
-			$sql = "update users set name=".$this->db->escape($name).", data=".$this->db->escape($data)." where id=".$row->id;		
-			$result = $this->db->query($sql);
-			$myid = $row->id;
+			$userdata = $this->user_model->readByIdentifier($iduser);
+			$this->session->set_userdata($userdata);
 		}
 
 		return  $myid;

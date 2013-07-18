@@ -3,7 +3,7 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>Bootstrap, from Twitter</title>
+    <title>StartupWeb</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -56,7 +56,11 @@
           <a class="brand" href="#">Project name</a>
           <div class="nav-collapse collapse">
             <p class="navbar-text pull-right">
-              Logged in as <a href="#" class="navbar-link">Username</a>
+            <?php if ($this->session->userdata("identifier") != "") { ?>
+              Logged in as <a href="<?=$this->session->userdata("profileurl")?>" target="_new" class="navbar-link"><?=$this->session->userdata("displayname")?></a>
+            <?php } else { ?>
+              <a href="<?=base_url();?>index.php/hauth/signin" class="navbar-link">Sign in</a>
+            <?php }?>
             </p>
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
