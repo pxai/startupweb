@@ -8,8 +8,8 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <!-- Le styles -->
-    <link href="../../css/bootstrap.min.css" rel="stylesheet">
+  <!-- Le styles -->
+    <link href="<?=base_url('css/bootstrap.min.css');?>" rel="stylesheet">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -28,7 +28,8 @@
         }
       }
     </style>
-    <link href="../../css/bootstrap-responsive.css" rel="stylesheet">
+    <link href="<?=base_url('css/bootstrap-responsive.min.css');?>" rel="stylesheet">
+
 
     <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>

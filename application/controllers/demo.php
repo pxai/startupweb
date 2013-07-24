@@ -19,15 +19,15 @@ class Demo extends CI_Controller {
 	 */
 	public function index()
 	{
-		$this->load->view('demos/index.html');
+		$this->load->view('demos/index.php');
 	}
 
 	public function page($page,$subpage="")
 	{
 		if ($subpage == "") {
-			$this->load->view('demos/'.$page.'/index.html');
+			$this->load->view('demos/'.$page.'/index.php');
 		} else {
-			$this->load->view('demos/'.$page.'/'.$subpage.'.html');
+			$this->load->view('demos/'.$page.'/'.$subpage.'.php');
 		}
 	}
 

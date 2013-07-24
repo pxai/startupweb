@@ -3,10 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<title>jQuery UI Accordion - Collapse content</title>
-	<link rel="stylesheet" href="../../../../css/themes/base/jquery-ui.min.css">
-	<script src="../../../../js/jquery.min.js"></script>
-	<script src="../../../../js/ui/jquery-ui.min.js"></script>
-	<link rel="stylesheet" href="../../../demos.css">
+	<link rel="stylesheet" href="<?=base_url('css/themes/base/jquery-ui.min.css');?>">
+	<script src="<?=base_url('js/jquery.min.js');?>"></script>
+	<script src="<?=base_url('js/ui/jquery-ui.min.js');?>"></script>
 	<script>
 	$(function() {
 		$( "#accordion" ).accordion({
